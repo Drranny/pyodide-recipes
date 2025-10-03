@@ -16,15 +16,23 @@ def parse_junit_xml(xml_file: Path) -> dict:
     tree = ET.parse(xml_file)
     root = tree.getroot()
 
+    # Handle both <testsuite> and <testsuites><testsuite> structures
+    if root.tag == 'testsuites':
+        testsuite = root.find('testsuite')
+        if testsuite is None:
+            raise ValueError("No testsuite found in testsuites")
+    else:
+        testsuite = root
+
     # Top-level attributes from <testsuite>
-    total = int(root.get("tests", 0))
-    failures = int(root.get("failures", 0))
-    errors = int(root.get("errors", 0))
-    skipped = int(root.get("skipped", 0))
-    time = float(root.get("time", 0))
+    total = int(testsuite.get("tests", 0))
+    failures = int(testsuite.get("failures", 0))
+    errors = int(testsuite.get("errors", 0))
+    skipped = int(testsuite.get("skipped", 0))
+    time = float(testsuite.get("time", 0))
 
     failed_tests = []
-    for testcase in root.findall(".//testcase"):
+    for testcase in testsuite.findall(".//testcase"):
         failure = testcase.find("failure")
         error = testcase.find("error")
         if failure is not None or error is not None:
