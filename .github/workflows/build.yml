@@ -375,34 +375,11 @@ jobs:
           which python
           echo y | python -m pip install -r requirements.txt
 
-      - name: Run tests
-        run: |
-          pytest -v \
-            --dist-dir=./dist/ \
-            -n $(nproc) \
-            --runner=${{ matrix.test-config.runner }} \
-            --rt ${{ matrix.test-config.runtime }} \
-            --junitxml=test-results-${{ matrix.test-config.runtime }}.xml \
-            packages
-
-      - name: Parse test results
-        id: parse_test_results
-        run: |
-          if [ -f test-results-${{ matrix.test-config.runtime }}.xml ]; then
-            python tools/parse_test_result.py test-results-${{ matrix.test-config.runtime }}.xml ${{ matrix.test-config.runtime }} > test-summary-${{ matrix.test-config.runtime }}.md
-            echo "TEST_SUMMARY_CREATED=true" >> $GITHUB_ENV
-          else
-            echo "No test results XML found"
-            echo "TEST_SUMMARY_CREATED=false" >> $GITHUB_ENV
-          fi
-
-      - name: Store test summary
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        if: github.event_name == 'pull_request' && env.TEST_SUMMARY_CREATED == 'true'
+      - name: Run tests with pytest-results-action
+        uses: pmeier/pytest-results-action@v1
         with:
-          name: test-summary-${{ matrix.test-config.runtime }}
-          path: test-summary-${{ matrix.test-config.runtime }}.md
-          retention-days: 7
+          pytest-args: "-v --dist-dir=./dist/ -n $(nproc) --runner=${{ matrix.test-config.runner }} --rt ${{ matrix.test-config.runtime }} packages"
+          report-title: "Test Results - ${{ matrix.test-config.runtime }}"
 
   # This job runs the SciPy tests with Node.js based on the
   # above checks; separate from the main test job.
