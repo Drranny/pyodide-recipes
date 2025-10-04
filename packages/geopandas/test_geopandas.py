@@ -62,3 +62,12 @@ def test_runtest(selenium):
             str(test_path / "test_explore.py"),
         ],
     )
+
+
+# CI 검증용 더미 실패 테스트 - pytest-results-action 동작 확인용
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["geopandas"])
+def test_ci_verification_dummy_fail(selenium):
+    """CI 검증용 더미 실패 테스트 - pytest-results-action이 실패한 테스트만 표시하는지 확인"""
+    # 의도적으로 실패하는 assertion
+    assert 1 == 2, "Intentional failure for CI verification of pytest-results-action"
