@@ -71,3 +71,32 @@ def test_load_largish_file(selenium_standalone, request, httpserver):
         assert df.shape == ({n_rows}, 8)
         """
     )
+
+
+# CI 검증용 더미 실패 테스트들 - pytest-results-action 동작 확인용
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["pandas"])
+def test_ci_verification_pandas_fail_1(selenium):
+    """CI 검증용 pandas 실패 테스트 1 - DataFrame 크기 비교 실패"""
+    import pandas as pd
+    df1 = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    df2 = pd.DataFrame({'A': [1, 2], 'B': [4, 5]})
+    assert df1.shape == df2.shape, f"DataFrame shape mismatch: {df1.shape} != {df2.shape}"
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["pandas"])
+def test_ci_verification_pandas_fail_2(selenium):
+    """CI 검증용 pandas 실패 테스트 2 - Series 값 비교 실패"""
+    import pandas as pd
+    s1 = pd.Series([1, 2, 3, 4])
+    s2 = pd.Series([1, 2, 3, 5])
+    pd.testing.assert_series_equal(s1, s2, "Series values don't match")
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["pandas"])
+def test_ci_verification_pandas_fail_3(selenium):
+    """CI 검증용 pandas 실패 테스트 3 - 인덱스 비교 실패"""
+    import pandas as pd
+    df = pd.DataFrame({'A': [1, 2, 3]}, index=['a', 'b', 'c'])
+    expected_index = ['x', 'y', 'z']
+    assert list(df.index) == expected_index, f"Index mismatch: {list(df.index)} != {expected_index}"

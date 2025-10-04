@@ -365,3 +365,31 @@ def test_np_unique(selenium):
     import numpy as np
 
     np.unique(np.array([1.1, 1.1]), axis=-1)
+
+
+# CI 검증용 더미 실패 테스트들 - pytest-results-action 동작 확인용
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["numpy"])
+def test_ci_verification_numpy_fail_1(selenium):
+    """CI 검증용 numpy 실패 테스트 1 - 배열 크기 비교 실패"""
+    import numpy as np
+    arr1 = np.array([1, 2, 3])
+    arr2 = np.array([1, 2, 3, 4])
+    assert arr1.shape == arr2.shape, f"Shape mismatch: {arr1.shape} != {arr2.shape}"
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["numpy"])
+def test_ci_verification_numpy_fail_2(selenium):
+    """CI 검증용 numpy 실패 테스트 2 - 배열 값 비교 실패"""
+    import numpy as np
+    arr1 = np.array([1.0, 2.0, 3.0])
+    arr2 = np.array([1.0, 2.0, 3.1])
+    np.testing.assert_array_equal(arr1, arr2, "Array values don't match")
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["numpy"])
+def test_ci_verification_numpy_fail_3(selenium):
+    """CI 검증용 numpy 실패 테스트 3 - 수학 연산 실패"""
+    import numpy as np
+    result = np.sqrt(-1)  # This should be NaN
+    assert np.isfinite(result), f"Expected finite number but got {result}"

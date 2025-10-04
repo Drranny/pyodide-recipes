@@ -202,3 +202,39 @@ def test_cmdline_runner(selenium, venv):
     print(result.stdout)
     print(result.stderr)
     assert result.returncode == 0
+
+
+# CI 검증용 더미 실패 테스트들 - pytest-results-action 동작 확인용
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["scipy"])
+def test_ci_verification_scipy_fail_1(selenium):
+    """CI 검증용 scipy 실패 테스트 1 - 선형대수 연산 실패"""
+    import numpy as np
+    from scipy.linalg import inv
+    # 특이행렬 (역행렬이 존재하지 않음)
+    singular_matrix = np.array([[1, 1], [1, 1]])
+    result = inv(singular_matrix)
+    assert np.isfinite(result).all(), "Matrix inversion should fail for singular matrix"
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["scipy"])
+def test_ci_verification_scipy_fail_2(selenium):
+    """CI 검증용 scipy 실패 테스트 2 - 통계 함수 실패"""
+    from scipy.stats import norm
+    # 잘못된 매개변수로 정규분포 생성
+    result = norm.cdf(0, loc=0, scale=-1)  # 음수 표준편차
+    assert result >= 0, "CDF should be non-negative"
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["scipy"])
+def test_ci_verification_scipy_fail_3(selenium):
+    """CI 검증용 scipy 실패 테스트 3 - 최적화 함수 실패"""
+    from scipy.optimize import minimize
+    import numpy as np
+    
+    def objective(x):
+        return x[0]**2 + x[1]**2
+    
+    # 잘못된 초기값으로 최적화
+    result = minimize(objective, x0=[np.inf, np.inf])
+    assert result.success, "Optimization should fail with infinite initial values"
