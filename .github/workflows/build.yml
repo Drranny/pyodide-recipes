@@ -395,6 +395,13 @@ jobs:
           fail-on-empty: true
           title: "Test Results - ${{ matrix.test-config.runtime }}"
 
+      - name: Upload test results XML
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.test-config.runtime }}
+          path: test-results-${{ matrix.test-config.runtime }}.xml
+        if: always()
+
   # This job runs the SciPy tests with Node.js based on the
   # above checks; separate from the main test job.
   test-scipy:

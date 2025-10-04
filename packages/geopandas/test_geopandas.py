@@ -64,10 +64,25 @@ def test_runtest(selenium):
     )
 
 
-# CI 검증용 더미 실패 테스트 - pytest-results-action 동작 확인용
+# CI 검증용 더미 실패 테스트들 - pytest-results-action 동작 확인용
 @pytest.mark.driver_timeout(60)
 @run_in_pyodide(packages=["geopandas"])
-def test_ci_verification_dummy_fail(selenium):
-    """CI 검증용 더미 실패 테스트 - pytest-results-action이 실패한 테스트만 표시하는지 확인"""
-    # 의도적으로 실패하는 assertion
+def test_ci_verification_dummy_fail_1(selenium):
+    """CI 검증용 더미 실패 테스트 1 - 기본 assertion 실패"""
     assert 1 == 2, "Intentional failure for CI verification of pytest-results-action"
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["geopandas"])
+def test_ci_verification_dummy_fail_2(selenium):
+    """CI 검증용 더미 실패 테스트 2 - 문자열 비교 실패"""
+    expected = "Hello World"
+    actual = "Hello Pyodide"
+    assert expected == actual, f"Expected '{expected}' but got '{actual}'"
+
+@pytest.mark.driver_timeout(60)
+@run_in_pyodide(packages=["geopandas"])
+def test_ci_verification_dummy_fail_3(selenium):
+    """CI 검증용 더미 실패 테스트 3 - 리스트 비교 실패"""
+    expected_list = [1, 2, 3, 4, 5]
+    actual_list = [1, 2, 3, 4, 6]
+    assert expected_list == actual_list, f"List mismatch: {expected_list} != {actual_list}"
