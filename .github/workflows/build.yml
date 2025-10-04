@@ -404,6 +404,14 @@ jobs:
           path: test-summary-${{ matrix.test-config.runtime }}.md
           retention-days: 7
 
+      - name: Store JUnit test results
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()  # 성공/실패 상관없이 업로드
+        with:
+          name: junit-results-${{ matrix.test-config.runtime }}
+          path: test-results-${{ matrix.test-config.runtime }}.xml
+          retention-days: 7
+
   # This job runs the SciPy tests with Node.js based on the
   # above checks; separate from the main test job.
   test-scipy:
