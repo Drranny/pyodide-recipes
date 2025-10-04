@@ -375,11 +375,24 @@ jobs:
           which python
           echo y | python -m pip install -r requirements.txt
 
-      - name: Run tests with pytest-results-action
-        uses: pmeier/pytest-results-action@v1
+      - name: Run tests
+        run: |
+          pytest -v \
+            --dist-dir=./dist/ \
+            -n $(nproc) \
+            --runner=${{ matrix.test-config.runner }} \
+            --rt ${{ matrix.test-config.runtime }} \
+            --junitxml=test-results-${{ matrix.test-config.runtime }}.xml \
+            packages
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()  # Always run to show results even if tests fail
         with:
-          pytest-args: "-v --dist-dir=./dist/ -n $(nproc) --runner=${{ matrix.test-config.runner }} --rt ${{ matrix.test-config.runtime }} packages"
-          report-title: "Test Results - ${{ matrix.test-config.runtime }}"
+          files: test-results-${{ matrix.test-config.runtime }}.xml
+          check_name: "Test Results - ${{ matrix.test-config.runtime }}"
+          comment_mode: create new
+          comment_title: "Test Results Summary - ${{ matrix.test-config.runtime }}"
 
   # This job runs the SciPy tests with Node.js based on the
   # above checks; separate from the main test job.
